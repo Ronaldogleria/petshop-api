@@ -1,0 +1,233 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Pet Shop API",
+        "version": "1.0.0",
+        "description": "API RESTful para gerenciamento de Pet Shop com Atendentes, Clientes e Pets."
+    },
+    "servers": [
+        {
+            "url": "/api",
+            "description": "Servidor Local"
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        },
+        "schemas": {
+            "Attendant": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer" },
+                    "name": { "type": "string" },
+                    "email": { "type": "string", "format": "email" }
+                },
+                "required": ["name", "email"]
+            },
+            "Client": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer" },
+                    "name": { "type": "string" },
+                    "email": { "type": "string", "format": "email" },
+                    "phone": { "type": "string", "nullable": true }
+                },
+                "required": ["name", "email"]
+            },
+            "Pet": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer" },
+                    "name": { "type": "string" },
+                    "species": { "type": "string" },
+                    "breed": { "type": "string", "nullable": true },
+                    "birthDate": { "type": "string", "format": "date", "nullable": true },
+                    "clientId": { "type": "integer" },
+                    "attendantId": { "type": "integer", "nullable": true }
+                },
+                "required": ["name", "species", "clientId"]
+            },
+            "Login": {
+                "type": "object",
+                "properties": {
+                    "email": { "type": "string", "format": "email" },
+                    "password": { "type": "string", "format": "password" }
+                },
+                "required": ["email", "password"]
+            },
+            "Token": {
+                "type": "object",
+                "properties": {
+                    "token": { "type": "string" }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/auth/register": {
+            "post": {
+                "summary": "Registrar um novo atendente",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/Login" }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": { "description": "Atendente registrado com sucesso" },
+                    "409": { "description": "E-mail já cadastrado" }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "summary": "Login do atendente e obtenção de token JWT",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/Login" }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Login bem-sucedido", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Token" } } } },
+                    "401": { "description": "E-mail ou senha inválidos" }
+                }
+            }
+        },
+        "/clients": {
+            "post": {
+                "summary": "Criar um novo cliente (Requer JWT)",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/Client" }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": { "description": "Cliente criado com sucesso" },
+                    "401": { "description": "Não autorizado" }
+                }
+            },
+            "get": {
+                "summary": "Listar todos os clientes (Requer JWT)",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Lista de clientes" },
+                    "401": { "description": "Não autorizado" }
+                }
+            }
+        },
+        "/clients/{id}": {
+            "get": {
+                "summary": "Buscar cliente por ID (Requer JWT)",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+                "responses": {
+                    "200": { "description": "Detalhes do cliente" },
+                    "404": { "description": "Cliente não encontrado" }
+                }
+            },
+            "put": {
+                "summary": "Atualizar cliente por ID (Requer JWT)",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/Client" }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Cliente atualizado" },
+                    "404": { "description": "Cliente não encontrado" }
+                }
+            },
+            "delete": {
+                "summary": "Deletar cliente por ID (Requer JWT)",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+                "responses": {
+                    "204": { "description": "Cliente deletado com sucesso" },
+                    "404": { "description": "Cliente não encontrado" }
+                }
+            }
+        },
+        "/pets": {
+            "post": {
+                "summary": "Criar um novo pet (Requer JWT)",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/Pet" }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": { "description": "Pet criado com sucesso" },
+                    "401": { "description": "Não autorizado" }
+                }
+            },
+            "get": {
+                "summary": "Listar todos os pets (Requer JWT)",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Lista de pets" },
+                    "401": { "description": "Não autorizado" }
+                }
+            }
+        },
+        "/pets/{id}": {
+            "get": {
+                "summary": "Buscar pet por ID (Requer JWT)",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+                "responses": {
+                    "200": { "description": "Detalhes do pet" },
+                    "404": { "description": "Pet não encontrado" }
+                }
+            },
+            "put": {
+                "summary": "Atualizar pet por ID (Requer JWT)",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/Pet" }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Pet atualizado" },
+                    "404": { "description": "Pet não encontrado" }
+                }
+            },
+            "delete": {
+                "summary": "Deletar pet por ID (Requer JWT)",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+                "responses": {
+                    "204": { "description": "Pet deletado com sucesso" },
+                    "404": { "description": "Pet não encontrado" }
+                }
+            }
+        }
+    }
+}
