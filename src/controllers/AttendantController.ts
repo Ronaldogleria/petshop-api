@@ -4,7 +4,7 @@ import { Attendant } from '../models/Attendant';
 import * as jwt from 'jsonwebtoken';
 
 const attendantRepository = AppDataSource.getRepository(Attendant);
-
+// oi
 export class AttendantController {
     // Cria um novo atendente (Registro)
     async register(req: Request, res: Response) {
