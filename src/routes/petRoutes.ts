@@ -9,9 +9,9 @@ const petController = new PetController();
 router.use(authMiddleware);
 
 router.post('/', petController.create);
-router.get('/', petController.findAll);
-router.get('/:id', petController.findOne);
+router.get('/', petController.getAll);
+router.get('/:id', petController.getById);
 router.put('/:id', petController.update);
-router.delete('/:id', petController.remove);
+router.delete('/:id', petController.delete);
 
 export default router;

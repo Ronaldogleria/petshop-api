@@ -5,97 +5,76 @@ import { Client } from '../models/Client';
 const clientRepository = AppDataSource.getRepository(Client);
 
 export class ClientController {
-    // Criar Cliente
     async create(req: Request, res: Response) {
         const { name, email, phone } = req.body;
 
         if (!name || !email) {
-            return res.status(400).json({ message: 'Nome e e-mail são obrigatórios.' });
+            return res.status(400).json({ message: 'Nome e email são obrigatórios.' });
         }
 
         try {
             const existingClient = await clientRepository.findOneBy({ email });
             if (existingClient) {
-                return res.status(409).json({ message: 'E-mail de cliente já cadastrado.' });
+                return res.status(409).json({ message: 'Email já cadastrado.' });
             }
 
             const client = clientRepository.create({ name, email, phone });
-            await clientRepository.save(client);
+            const savedClient = await clientRepository.save(client);
 
-            return res.status(201).json(client);
+            return res.status(201).json(savedClient);
         } catch (error) {
             console.error(error);
             return res.status(500).json({ message: 'Erro ao criar cliente.' });
         }
     }
 
-    // Listar Clientes
-    async findAll(req: Request, res: Response) {
+    async getAll(req: Request, res: Response) {
         try {
-            const clients = await clientRepository.find({ relations: ['pets'] });
-            return res.json(clients);
+            const clients = await clientRepository.find();
+            return res.status(200).json(clients);
         } catch (error) {
             console.error(error);
             return res.status(500).json({ message: 'Erro ao buscar clientes.' });
         }
     }
 
-    // Buscar Cliente por ID
-    async findOne(req: Request, res: Response) {
-        const id = parseInt(req.params.id);
-
+    async getById(req: Request, res: Response) {
+        const { id } = req.params;
         try {
-            const client = await clientRepository.findOne({ 
-                where: { id },
-                relations: ['pets']
-            });
-
+            const client = await clientRepository.findOneBy({ id: parseInt(id) });
             if (!client) {
                 return res.status(404).json({ message: 'Cliente não encontrado.' });
             }
-
-            return res.json(client);
+            return res.status(200).json(client);
         } catch (error) {
             console.error(error);
             return res.status(500).json({ message: 'Erro ao buscar cliente.' });
         }
     }
 
-    // Atualizar Cliente
     async update(req: Request, res: Response) {
-        const id = parseInt(req.params.id);
-        const { name, email, phone } = req.body;
-
+        const { id } = req.params;
         try {
-            let client = await clientRepository.findOneBy({ id });
-
+            const client = await clientRepository.findOneBy({ id: parseInt(id) });
             if (!client) {
                 return res.status(404).json({ message: 'Cliente não encontrado.' });
             }
-
-            clientRepository.merge(client, { name, email, phone });
-            const result = await clientRepository.save(client);
-
-            return res.json(result);
+            await clientRepository.update(parseInt(id), req.body);
+            const updatedClient = await clientRepository.findOneBy({ id: parseInt(id) });
+            return res.status(200).json(updatedClient);
         } catch (error) {
             console.error(error);
             return res.status(500).json({ message: 'Erro ao atualizar cliente.' });
         }
     }
 
-    // Deletar Cliente
-    async remove(req: Request, res: Response) {
-        const id = parseInt(req.params.id);
-
+    async delete(req: Request, res: Response) {
+        const { id } = req.params;
         try {
-            const clientToRemove = await clientRepository.findOneBy({ id });
-
-            if (!clientToRemove) {
+            const result = await clientRepository.delete(parseInt(id));
+            if (result.affected === 0) {
                 return res.status(404).json({ message: 'Cliente não encontrado.' });
             }
-
-            await clientRepository.remove(clientToRemove);
-
             return res.status(204).send();
         } catch (error) {
             console.error(error);

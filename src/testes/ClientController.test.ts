@@ -7,6 +7,12 @@ import { Request, Response } from 'express';
 jest.mock('../config/data-source', () => ({
     AppDataSource: {
         getRepository: jest.fn().mockReturnValue({
+            // Ajusta o mock para retornar uma instância real de Client
+            create: jest.fn(dto => {
+                const client = new Client();
+                Object.assign(client, dto);
+                return client;
+            }),
             save: jest.fn(),
             find: jest.fn(),
             findOneBy: jest.fn(),
@@ -45,16 +51,19 @@ describe('ClientController', () => {
     describe('create', () => {
         it('deve criar um cliente com sucesso e retornar 201', async () => {
             mockRequest.body = { name: 'Novo Cliente', email: 'novo@cliente.com', phone: '123456789' };
-            const savedClient = { id: 1, ...mockRequest.body };
+            
+            // O controller retorna uma instância de Client, então o teste deve esperar o mesmo.
+            const expectedClient = new Client();
+            Object.assign(expectedClient, { id: 1, ...mockRequest.body });
 
             clientRepositoryMock.findOneBy.mockResolvedValue(null);
-            clientRepositoryMock.save.mockResolvedValue(savedClient);
+            clientRepositoryMock.save.mockResolvedValue(expectedClient);
 
             await clientController.create(mockRequest as Request, mockResponse as Response);
 
             expect(clientRepositoryMock.save).toHaveBeenCalledWith(expect.any(Client));
             expect(mockResponse.status).toHaveBeenCalledWith(201);
-            expect(mockResponse.json).toHaveBeenCalledWith(savedClient);
+            expect(mockResponse.json).toHaveBeenCalledWith(expectedClient);
         });
 
         it('deve retornar 400 se faltarem campos obrigatórios', async () => {

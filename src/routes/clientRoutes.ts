@@ -9,9 +9,9 @@ const clientController = new ClientController();
 router.use(authMiddleware);
 
 router.post('/', clientController.create);
-router.get('/', clientController.findAll);
-router.get('/:id', clientController.findOne);
+router.get('/', clientController.getAll);
+router.get('/:id', clientController.getById);
 router.put('/:id', clientController.update);
-router.delete('/:id', clientController.remove);
+router.delete('/:id', clientController.delete);
 
 export default router;
