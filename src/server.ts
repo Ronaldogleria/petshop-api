@@ -28,13 +28,18 @@ app.get('/', (req, res) => {
     res.send('Pet Shop API is running!');
 });
 
-// Inicialização do banco de dados e do servidor
-AppDataSource.initialize()
-    .then(() => {
-        console.log("Data Source inicializado!");
-        app.listen(PORT, () => {
-            console.log(`Servidor rodando na porta ${PORT}`);
-            console.log(`Documentação Swagger em http://localhost:${PORT}/api-docs`);
-        });
-    })
-    .catch((error) => console.log("Erro ao inicializar Data Source:", error));
+let server: any;
+
+if (process.env.NODE_ENV !== 'test') {
+    AppDataSource.initialize()
+        .then(() => {
+            console.log("Data Source inicializado!");
+            server = app.listen(PORT, () => {
+                console.log(`Servidor rodando na porta ${PORT}`);
+                console.log(`Documentação Swagger em http://localhost:${PORT}/api-docs`);
+            });
+        })
+        .catch((error) => console.log("Erro ao inicializar Data Source:", error));
+}
+
+export { app, server };

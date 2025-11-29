@@ -1,7 +1,7 @@
 import { DataSource, Repository } from "typeorm";
-import { TestDataSource } from "../config/test-data-source";
-import { Pet } from "../models/Pet";
-import { Client } from "../models/Client";
+import { TestDataSource } from "../../testes/test-data-source";
+import { Pet } from "../../models/Pet";
+import { Client } from "../../models/Client";
 
 describe('Client Model Test', () => {
     let connection: DataSource;

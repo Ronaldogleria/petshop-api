@@ -1,7 +1,7 @@
-import { AppDataSource } from '../config/data-source';
-import { Pet } from '../models/Pet';
-import { Client } from '../models/Client';
-import { Attendant } from '../models/Attendant';
+import { AppDataSource } from '../../config/data-source';
+import { Pet } from '../../models/Pet';
+import { Client } from '../../models/Client';
+import { Attendant } from '../../models/Attendant';
 import { Request, Response } from 'express';
 
 // Mocks para os repositórios
@@ -26,7 +26,7 @@ const attendantRepositoryMock = {
 };
 
 // Mock do AppDataSource para retornar o repositório correto para cada entidade
-jest.mock('../config/data-source', () => ({
+jest.mock('../../config/data-source', () => ({
     AppDataSource: {
         getRepository: jest.fn((entity: any) => {
             // Lazy require para evitar erros de inicialização (ReferenceError)
@@ -38,7 +38,7 @@ jest.mock('../config/data-source', () => ({
 }));
 
 // Importa o controller APÓS a configuração dos mocks
-import { PetController } from '../controllers/PetController';
+import { PetController } from '../../controllers/PetController';
 
 describe('PetController', () => {
     let petController: PetController;

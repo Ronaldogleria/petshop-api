@@ -1,7 +1,7 @@
 import { DataSource, Repository } from "typeorm";
-import { TestDataSource } from "../config/test-data-source";
-import { Pet } from "../models/Pet";
-import { Attendant } from "../models/Attendant";
+import { TestDataSource } from "../../testes/test-data-source";
+import { Pet } from "../../models/Pet";
+import { Attendant } from "../../models/Attendant";
 import * as bcrypt from 'bcryptjs';
 
 describe('Attendant Model Test', () => {

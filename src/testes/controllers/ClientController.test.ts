@@ -1,10 +1,10 @@
-import { ClientController } from '../controllers/ClientController';
-import { AppDataSource } from '../config/data-source';
-import { Client } from '../models/Client';
+import { ClientController } from '../../controllers/ClientController';
+import { AppDataSource } from '../../config/data-source';
+import { Client } from '../../models/Client';
 import { Request, Response } from 'express';
 
 // Mock do AppDataSource para evitar conexão real com o banco de dados
-jest.mock('../config/data-source', () => ({
+jest.mock('../../config/data-source', () => ({
     AppDataSource: {
         getRepository: jest.fn().mockReturnValue({
             // Ajusta o mock para retornar uma instância real de Client
